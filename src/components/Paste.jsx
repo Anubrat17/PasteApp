@@ -2,8 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
-import { FaEdit, FaTrashAlt, FaShareAlt, FaClipboard, FaEye, FaWhatsapp, FaTwitter, FaFacebookF, FaEnvelope } from "react-icons/fa";
-import { removePaste } from "../Redux/pasteSlice"; // Import removePaste from pasteSlice
+import {
+  FaEdit,
+  FaTrashAlt,
+  FaShareAlt,
+  FaClipboard,
+  FaEye,
+  FaWhatsapp,
+  FaTwitter,
+  FaFacebookF,
+  FaEnvelope,
+} from "react-icons/fa";
+import { removePaste } from "../Redux/pasteSlice";
 
 const Paste = () => {
   const pastes = useSelector((state) => state.paste.pastes);
@@ -25,10 +35,9 @@ const Paste = () => {
     paste.title.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
 
-  const handleDelete = async (pasteId) => {
+  const handleDelete = (pasteId) => {
     try {
-      dispatch(removePaste(pasteId)); // Dispatch the removePaste action
-      //toast.success("Paste deleted successfully");
+      dispatch(removePaste(pasteId));
     } catch (error) {
       toast.error("Failed to delete paste");
     }
@@ -97,69 +106,31 @@ const Paste = () => {
   };
 
   return (
-    <div className="min-h-screen pt-[80px] bg-slate-200 flex flex-col items-center justify-start px-4">
+    <div className="min-h-screen pt-[80px] bg-slate-200 flex flex-col items-center px-4">
       <Toaster position="top-right" reverseOrder={false} />
-      <div className="w-full max-w-4xl bg-slate-50 shadow-lg rounded-2xl p-8 flex flex-col space-y-6">
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-2xl p-6 space-y-6">
         <input
           aria-label="Search pastes"
-          className="p-3 rounded-xl border border-gray-300 bg-slate-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors placeholder:text-gray-500"
+          className="p-3 rounded-xl border border-gray-300 bg-slate-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-gray-500 w-full"
           type="search"
           placeholder="Search here..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+
         {loading ? (
           <div className="py-20 text-center text-gray-600 font-semibold">
             Loading pastes...
           </div>
         ) : filteredPastes.length > 0 ? (
-          <div className="flex flex-col gap-5 mt-5">
+          <div className="flex flex-col gap-6">
             {filteredPastes.map((paste) => (
               <div
-                className="border rounded-2xl p-4 shadow-md relative bg-slate-100"
+                className="border rounded-2xl p-4 shadow relative bg-slate-100"
                 key={paste._id}
               >
-                <div className="absolute top-4 right-4 flex gap-4 z-10">
-                  <button
-                    aria-label={`Edit paste titled ${paste.title}`}
-                    className="bg-blue-500 p-2 rounded-xl hover:bg-blue-600 transition"
-                    onClick={() => handleEdit(paste._id)}
-                  >
-                    <FaEdit className="text-white text-xl" />
-                  </button>
-                  <button
-                    aria-label={`View paste titled ${paste.title}`}
-                    className="bg-green-500 p-2 rounded-xl hover:bg-green-600 transition"
-                    onClick={() => handleView(paste._id)}
-                  >
-                    <FaEye className="text-white text-xl" />
-                  </button>
-                  <button
-                    aria-label={`Delete paste titled ${paste.title}`}
-                    onClick={() => handleDelete(paste._id)} // Pass paste._id
-                    className="p-2 rounded-xl transition text-white text-xl bg-red-500 hover:bg-red-600"
-                  >
-                    <FaTrashAlt />
-                  </button>
-
-                  <button
-                    aria-label={`Copy content of paste titled ${paste.title}`}
-                    onClick={() => handleCopy(paste?.content)}
-                    className="bg-purple-500 p-2 rounded-xl hover:bg-purple-600 transition"
-                  >
-                    <FaClipboard className="text-white text-xl" />
-                  </button>
-                  <button
-                    aria-label={`Share paste titled ${paste.title}`}
-                    className="bg-yellow-500 p-2 rounded-xl hover:bg-yellow-600 transition"
-                    onClick={() => toggleShareBox(paste._id)}
-                  >
-                    <FaShareAlt className="text-white text-xl" />
-                  </button>
-                </div>
-
                 {shareBoxState[paste._id] && (
-                  <div className="absolute inset-0 flex justify-center items-center z-20 bg-slate-100 bg-opacity-70 rounded-2xl p-4">
+                  <div className="absolute inset-0 flex justify-center items-center z-20 bg-slate-100 bg-opacity-90 rounded-2xl p-4">
                     <div className="relative w-full max-w-xs mx-auto bg-white rounded-xl p-4 shadow-xl flex flex-col gap-2">
                       <button
                         onClick={() => toggleShareBox(paste._id)}
@@ -199,17 +170,54 @@ const Paste = () => {
                   </div>
                 )}
 
-                <div className="flex flex-row justify-between items-start">
-                  <div className="flex flex-col w-2/3 break-words">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                  {/* Text Section */}
+                  <div className="flex flex-col flex-1 break-words">
                     <div className="font-semibold text-lg text-gray-900">
                       {paste.title}
                     </div>
-                    <div className="mt-2 text-sm text-gray-600 whitespace-pre-wrap">
+                    <div className="mt-2 text-sm text-gray-700 whitespace-pre-wrap">
                       {paste.content}
                     </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      {formatDate(paste.createdAt)}
+                    </div>
                   </div>
-                  <div className="ml-4 text-xs text-gray-500 self-end whitespace-nowrap">
-                    {formatDate(paste.createdAt)}
+
+                  {/* Button Row */}
+                  <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                    <div className="flex gap-2 overflow-x-auto sm:overflow-visible sm:flex-nowrap">
+                      <button
+                        onClick={() => handleEdit(paste._id)}
+                        className="bg-blue-500 p-3 rounded-xl hover:bg-blue-600 transition flex-shrink-0"
+                      >
+                        <FaEdit className="text-white text-xl" />
+                      </button>
+                      <button
+                        onClick={() => handleView(paste._id)}
+                        className="bg-green-500 p-3 rounded-xl hover:bg-green-600 transition flex-shrink-0"
+                      >
+                        <FaEye className="text-white text-xl" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(paste._id)}
+                        className="bg-red-500 p-3 rounded-xl hover:bg-red-600 transition flex-shrink-0"
+                      >
+                        <FaTrashAlt className="text-white text-xl" />
+                      </button>
+                      <button
+                        onClick={() => handleCopy(paste.content)}
+                        className="bg-purple-500 p-3 rounded-xl hover:bg-purple-600 transition flex-shrink-0"
+                      >
+                        <FaClipboard className="text-white text-xl" />
+                      </button>
+                      <button
+                        onClick={() => toggleShareBox(paste._id)}
+                        className="bg-yellow-500 p-3 rounded-xl hover:bg-yellow-600 transition flex-shrink-0"
+                      >
+                        <FaShareAlt className="text-white text-xl" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
